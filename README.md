@@ -1,6 +1,11 @@
 Naam:           Falco van den Hoogen<br>
 Studentnummer:  1867022<br>
 
+# Activate MLFLOW
+azureuser in 🌐 ML-RefVm-465781 in MADS_Machinelearning_FalcovdHoogen on  main [!] is 📦 v0.1.0 via 🐍 v3.11.5 (mads_machinelearning_falcovdhoogen-3.11) 
+❯ mlflow server --backend-store-uri sqlite:///mads_exam.db --default-artifact-root ./mlruns --host 127.0.0.1
+
+
 
 # MADS-exam-24
 The junior datascientist at your work is pretty confident about his knowledge of all the models; He has helped you out by doing some data exploration for you, and he even created two models!

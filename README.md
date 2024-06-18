@@ -1,5 +1,5 @@
-Naam: Falco van den Hoogen
-Studentnummer: 1867022
+Naam:           Falco van den Hoogen<br>
+Studentnummer:  1867022<br>
 
 
 # MADS-exam-24

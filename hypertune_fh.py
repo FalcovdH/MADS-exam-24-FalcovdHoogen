@@ -71,8 +71,8 @@ def train(config: Dict):
         settings=trainersettings,
         loss_fn=torch.nn.CrossEntropyLoss(),
         optimizer=torch.optim.Adam,
-        traindataloader=trainstreamer.stream(),
-        validdataloader=teststreamer.stream(),
+        traindataloader=train.stream(),
+        validdataloader=valid.stream(),
         scheduler=torch.optim.lr_scheduler.ReduceLROnPlateau,
     )
 

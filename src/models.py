@@ -5,7 +5,7 @@ from loguru import logger
 from torch import Tensor, nn
 
 
-class ConvBlock(nn.Module):
+class ConvBlock_old(nn.Module):
     def __init__(self, in_channels, out_channels):
         super().__init__()
         self.conv = nn.Sequential(
@@ -17,9 +17,8 @@ class ConvBlock(nn.Module):
 
     def forward(self, x):
         return self.conv(x)
-
-
-class CNN(nn.Module):
+    
+class CNN_old(nn.Module):
     def __init__(self, config: dict) -> None:
         super().__init__()
         hidden = config["hidden"]
@@ -49,7 +48,62 @@ class CNN(nn.Module):
             x = conv(x)
         x = self.dense(x)
         return x
+    
+class ConvBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, dropout_rate):
+        super(ConvBlock, self).__init__()
+        self.conv = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(),
+            nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(),
+            nn.Dropout(dropout_rate)
+        )
+        
+        # Define a 1x1 convolution to match the dimensions if necessary
+        self.match_dimensions = nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=1) if in_channels != out_channels else nn.Identity()
+        
+        # BatchNorm layer after the addition of skip connection
+        self.final_norm = nn.BatchNorm2d(out_channels)
 
+    def forward(self, x):
+        identity = x.clone() # Save the input for the skip connection
+        x = self.conv(x) # Pass through the convolutional block
+        identity = self.match_dimensions(identity) # Match dimensions if necessary
+        x += identity # Add the original input (skip connection)
+        x = self.final_norm(x) # Normalize the output
+        return x
+
+class CNN(nn.Module):
+    def __init__(self, config: dict) -> None:
+        super().__init__()
+        hidden = config['hidden']
+        dropout_rate = config('dropout_rate')
+        self.convolutions = nn.ModuleList([
+            ConvBlock(1, hidden, dropout_rate),
+        ])
+
+        for i in range(config['num_layers']):
+            self.convolutions.extend([ConvBlock(hidden, hidden, dropout_rate), nn.ReLU()])
+        self.convolutions.append(nn.MaxPool2d(2, 2))
+
+        self.dense = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear((8*6) * hidden, hidden),
+            nn.BatchNorm1d(hidden),
+            nn.ReLU(),
+            nn.Dropout(dropout_rate),
+            nn.Linear(hidden, config['num_classes']),
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        for conv in self.convolutions:
+            x = conv(x)
+        x = self.dense(x)
+        return x
+    
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model: int, dropout: float = 0.1, max_seq_len: int = 5000):
@@ -145,3 +199,5 @@ class Transformer(nn.Module):
         x = x.mean(dim=1)  # Global Average Pooling
         x = self.out(x)
         return x
+
+

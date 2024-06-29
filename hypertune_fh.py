@@ -38,12 +38,12 @@ def train(config: Dict):
     with FileLock(data_dir / ".lock"):
         # we lock the datadir to avoid parallel instances trying to
         # access the datadir
-        train = datasets.BaseDatastreamer(traindataset, preprocessor=BasePreprocessor(), batchsize=32)
-        valid = datasets.BaseDatastreamer(testdataset, preprocessor=BasePreprocessor(), batchsize=32)
+        train = BaseDatastreamer(traindataset, preprocessor=BasePreprocessor(), batchsize=32)
+        valid = BaseDatastreamer(testdataset, preprocessor=BasePreprocessor(), batchsize=32)
     
     device = "cpu"
-    traindataset.to(device)
-    testdataset.to(device)
+    train.to(device)
+    valid.to(device)
 
 
     # we set up the metric

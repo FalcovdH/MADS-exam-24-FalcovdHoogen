@@ -42,10 +42,7 @@ def train(config: Dict):
         valid = BaseDatastreamer(testdataset, preprocessor=BasePreprocessor(), batchsize=32)
     
     device = "cpu"
-    train.to(device)
-    valid.to(device)
-
-
+    
     # we set up the metric
     f1micro = metrics.F1Score(average='micro')
     f1macro = metrics.F1Score(average='macro')
@@ -90,6 +87,8 @@ if __name__ == "__main__":
     config = {
         "hidden": tune.randint(16, 64),
         "num_layers": tune.randint(2, 5),
+        "tune_dir": tune_dir,
+        "data_dir": data_dir,
         "num_classes": 5,
         "dropout_rate": tune.uniform(0.0, 0.3),
         "shape": (16, 12),

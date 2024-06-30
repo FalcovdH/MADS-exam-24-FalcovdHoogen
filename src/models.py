@@ -80,7 +80,7 @@ class CNN(nn.Module):
     def __init__(self, config: dict) -> None:
         super().__init__()
         hidden = config['hidden']
-        dropout_rate = config('dropout_rate')
+        dropout_rate = config['dropout_rate']
         self.convolutions = nn.ModuleList([
             ConvBlock(1, hidden, dropout_rate),
         ])

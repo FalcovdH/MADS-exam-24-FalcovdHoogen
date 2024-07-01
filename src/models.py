@@ -104,7 +104,15 @@ class CNN(nn.Module):
         x = self.dense(x)
         return x
     
-
+class WeightedCrossEntropyLoss(nn.Module):
+    def __init__(self, weight):
+        super(WeightedCrossEntropyLoss, self).__init__()
+        self.weight = weight
+        self.criterion = nn.CrossEntropyLoss(weight=self.weight)
+    
+    def forward(self, outputs, targets):
+        return self.criterion(outputs, targets)
+        
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model: int, dropout: float = 0.1, max_seq_len: int = 5000):
         super().__init__()

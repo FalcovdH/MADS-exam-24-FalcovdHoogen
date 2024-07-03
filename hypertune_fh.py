@@ -43,6 +43,12 @@ def train(config: Dict):
     
     device = "cpu"
     
+    # Assuming you have the class weights defined based on your dataset
+    class_weights = torch.tensor([1.0, 3.0, 3.0, 3.0, 3.0])  # Adjust these weights based on your class imbalance
+
+    # Instantiate the weighted cross-entropy loss
+    loss_fn = models.WeightedCrossEntropyLoss(class_weights)
+
     # we set up the metric
     f1micro = metrics.F1Score(average='micro')
     f1macro = metrics.F1Score(average='macro')
@@ -59,14 +65,14 @@ def train(config: Dict):
         train_steps=len(train),  # type: ignore
         valid_steps=len(valid),  # type: ignore
         reporttypes=[ReportTypes.RAY],
-        scheduler_kwargs={"factor": 0.5, "patience": 5},
+        scheduler_kwargs={"factor": 0.5, "patience": 4},
         earlystop_kwargs=None,
     )
 
     trainer = Trainer(
         model=model,
         settings=trainersettings,
-        loss_fn=torch.nn.CrossEntropyLoss(),
+        loss_fn=loss_fn,
         optimizer=torch.optim.Adam,
         traindataloader=train.stream(),
         validdataloader=valid.stream(),
@@ -83,14 +89,14 @@ if __name__ == "__main__":
         data_dir.mkdir(parents=True)
         logger.info(f"Created {data_dir}")
     tune_dir = Path("models/ray").resolve()
-
+    
     config = {
-        "hidden": tune.randint(16, 64),
-        "num_layers": tune.randint(2, 5),
+        "hidden": tune.randint(32, 128),
+        "num_layers": tune.randint(2, 6),
         "tune_dir": tune_dir,
         "data_dir": data_dir,
         "num_classes": 5,
-        "dropout_rate": tune.uniform(0.0, 0.3),
+        "dropout_rate": tune.uniform(0.01, 0.3),
         "shape": (16, 12),
     }
 

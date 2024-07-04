@@ -28,8 +28,11 @@ def train(config: Dict):
 
     # data_dir wordt doorgegeven via tune.with_parameters
     data_dir = config["data_dir"]
-    trainfile = data_dir / 'heart_big_train.parq'
-    testfile = data_dir / 'heart_big_test.parq'
+    
+    trainfile = data_dir / 'heart_train.parq'
+    testfile = data_dir / 'heart_test.parq'
+    # trainfile = data_dir / 'heart_big_train.parq'
+    # testfile = data_dir / 'heart_big_test.parq'
     
     shape = (16, 12)
     traindataset = datasets.HeartDataset2D(trainfile, target="target", shape=shape)
@@ -44,7 +47,8 @@ def train(config: Dict):
     device = "cpu"
     
     # Assuming you have the class weights defined based on your dataset
-    class_weights = torch.tensor([1.0, 3.0, 3.0, 3.0, 3.0])  # Adjust these weights based on your class imbalance
+    # class_weights = torch.tensor([1.0, 3.0, 3.0, 3.0, 3.0])  # 5 for the multi class
+    class_weights = torch.tensor([1.0, 3.0]) 
 
     # Instantiate the weighted cross-entropy loss
     loss_fn = models.WeightedCrossEntropyLoss(class_weights)
@@ -95,7 +99,7 @@ if __name__ == "__main__":
         "num_layers": tune.randint(2, 6),
         "tune_dir": tune_dir,
         "data_dir": data_dir,
-        "num_classes": 5,
+        "num_classes": 2, #5 for the multi class
         "dropout_rate": tune.uniform(0.01, 0.3),
         "shape": (16, 12),
     }

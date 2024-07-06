@@ -10,11 +10,13 @@ class HeartDataset2D:
         path: Path,
         target: str,
         shape: tuple[int, int] = (16, 12),
-        use_fraction: float = 1.0  # Add a use_fraction parameter with a default value of 1.0
+        use_fraction: float = 1.0,  # Add a use_fraction parameter with a default value of 1.0
     ) -> None:
         self.df = pd.read_parquet(path)
         if use_fraction < 1.0:
-            self.df = self.df.sample(frac=use_fraction, random_state=42).reset_index(drop=True)
+            self.df = self.df.sample(frac=use_fraction, random_state=42).reset_index(
+                drop=True
+            )
 
         self.target = target
         _x = self.df.drop("target", axis=1)

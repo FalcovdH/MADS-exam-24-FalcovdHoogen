@@ -5,7 +5,7 @@ import ray
 import torch
 from filelock import FileLock
 from loguru import logger
-from mltrainer import ReportTypes, Trainer, TrainerSettings, metrics, rnn_models
+from mltrainer import ReportTypes, Trainer, TrainerSettings, rnn_models
 from mltrainer.preprocessors import PaddedPreprocessor
 import numpy as np
 from ray import tune
